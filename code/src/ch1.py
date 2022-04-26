@@ -44,7 +44,7 @@ class Agent:
         self.ns[action] += 1
         self.Qs += (reward - self.Qs[action]) / self.ns[action]
 
-    def get_action(self) -> int:
+    def get_action(self):
         if np.random.rand() < self.epsilon:
             return np.random.randint(0, len(self.Qs))
         return np.argmax(self.Qs)
