@@ -1,4 +1,4 @@
-from tkinter import W
+from collections import defaultdict
 import numpy as np
 from typing import Iterator
 from itertools import product
@@ -68,13 +68,13 @@ class GridWorld:
 
 def eval_onestep(
     pi: dict[tuple[int, int], dict],
-    V: dict[tuple[int, int], int],
+    V: dict[tuple[int, int], float],
     env: GridWorld,
-    gamma=0.9,
-) -> dict[tuple[int, int], int]:
+    gamma: float = 0.9,
+) -> dict[tuple[int, int], float]:
     for state in env.states():
         if state == env.goal_state:
-            # ゴールの価値観数は0
+            # ゴールの価値関数は0
             V[state] = 0
             continue
 
@@ -90,13 +90,33 @@ def eval_onestep(
     return V
 
 
+def value_iter_onestep(
+    V: dict[tuple[int, int], float], env: GridWorld, gamma: float
+) -> dict[tuple[int, int], float]:
+    for state in env.states():
+        if state == env.goal_state:
+            # ゴールの価値関数は0
+            V[state] = 0
+            continue
+
+        action_values = []
+        for action in env.actions():
+            next_state = env.next_state(state, action)
+            r = env.reward(state, action, next_state)
+            value = r + gamma * V[next_state]
+            action_values.append(value)
+
+        V[state] = max(action_values)
+    return V
+
+
 def policy_eval(
     pi: dict[tuple[int, int], dict],
-    V: dict[tuple[int, int], int],
+    V: dict[tuple[int, int], float],
     env: GridWorld,
-    gamma=0.9,
-    threshold=0.001,
-) -> dict[tuple[int, int], int]:
+    gamma: float = 0.9,
+    threshold: float = 0.001,
+) -> dict[tuple[int, int], float]:
 
     while True:
         old_V = V.copy()
@@ -108,3 +128,73 @@ def policy_eval(
         if delta < threshold:
             break
     return V
+
+
+def value_iter(
+    V: dict[tuple[int, int], float],
+    env: GridWorld,
+    gamma: float,
+    threshold: float = 0.001,
+    is_render: bool = False,
+) -> dict[tuple[int, int], float]:
+    while True:
+        if is_render:
+            env.render_v(V)
+
+        old_V = V.copy()
+        V = value_iter_onestep(V, env, gamma)
+
+        # compute max(delta by updating V)
+        delta = max(abs(V[state] - old_V[state]) for state in V.keys())
+
+        if delta < threshold:
+            break
+    return V
+
+
+def argmax(d: dict):
+    return max(d, key=d.get)
+
+
+def greedy_policy(
+    V: dict[tuple[int, int], float], env: GridWorld, gamma: float
+) -> dict[tuple[int, int], dict]:
+    pi = {}
+
+    for state in env.states():
+
+        action_values = {}
+
+        for action in env.actions():
+            next_state = env.next_state(state, action)
+            r = env.reward(state, action, next_state)
+            value = r + gamma * V[next_state]
+            action_values[action] = value
+
+            # greedy action
+            max_action = argmax(action_values)
+            action_probs = {i: 0.0 for i in range(4)}
+            action_probs[max_action] = 1.0
+            pi[state] = action_probs
+
+    return pi
+
+
+def policy_iter(
+    env: GridWorld, gamma: float, threshold: float = 0.001, is_render: bool = False
+) -> dict[tuple[int, int], dict]:
+    pi = defaultdict(lambda: {i: 0.25 for i in range(4)})
+    V: dict[tuple[int, int], float] = defaultdict(lambda: 0.0)
+
+    while True:
+        V = policy_eval(pi, V, env, gamma, threshold)
+        new_pi = greedy_policy(V, env, gamma)
+
+        if is_render:
+            env.render_v(V, pi)
+
+        if new_pi == pi:
+            break
+        pi = new_pi
+
+    return pi
