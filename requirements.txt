@@ -9,3 +9,11 @@ jupyterlab_widgets==1.1.0
 isort==5.10.1
 jupyterlab-vim==0.15.1
 icecream==2.1.2
+torch==1.11.0
+gym==0.23.1
+pygame==2.1.2
+gym-notebook-wrapper==1.3.2
+pyvirtualdisplay==3.0
+torchtyping==0.1.4
+typeguard==2.13.3
+tqdm==4.64.0
