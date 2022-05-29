@@ -16,7 +16,7 @@ $ docker compose -f "docker-compose.yaml" up -d --build
 
 ## 参考リンク
 
-[ゼロから作るDeep Learning ❹ ―強化学習編　を読んで実装した](https://blog.hatena.ne.jp/sereronnrot/zypressen.hatenadiary.com/edit)にまとめている。
+[ゼロから作るDeep Learning ❹ ―強化学習編　を読んで実装した](https://blog.hatena.ne.jp/sereronnrot/zypressen.hatenadiary.com)にまとめている。
 
 ## License
 The source code is licensed MIT.
