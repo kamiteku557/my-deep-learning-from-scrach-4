@@ -1,4 +1,4 @@
-# deep-learning-from-scrach-4
+# my-deep-learning-from-scrach-4
 [ゼロから作るDeep Learning 4 強化学習編](https://www.oreilly.co.jp/books/9784873119755/)の(ほぼ)写経リポジトリ。  
 [公式リポジトリ](https://github.com/oreilly-japan/deep-learning-from-scratch-4)の内容とは、以下のような相違がある。  
 
